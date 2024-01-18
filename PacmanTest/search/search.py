@@ -73,27 +73,77 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
+    """Search the deepest nodes in the search tree first."""
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
+    #states to be explored (LIFO). holds nodes in form (state, action)
+    frontier = util.Stack()
+    #previously explored states (for path checking), holds states
+    exploredNodes = []
+    #define start node
+    startState = problem.getStartState()
+    startNode = (startState, [])
+    
+    frontier.push(startNode)
+    
+    while not frontier.isEmpty():
+        #begin exploring last (most-recently-pushed) node on frontier
+        currentState, actions = frontier.pop()
+        
+        if currentState not in exploredNodes:
+            #mark current node as explored
+            exploredNodes.append(currentState)
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+            if problem.isGoalState(currentState):
+                return actions
+            else:
+                #get list of possible successor nodes in 
+                #form (successor, action, stepCost)
+                successors = problem.getSuccessors(currentState)
+                
+                #push each successor to frontier
+                for succState, succAction, succCost in successors:
+                    newAction = actions + [succAction]
+                    newNode = (succState, newAction)
+                    frontier.push(newNode)
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return actions  
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
+    #to be explored (FIFO)
+    frontier = util.Queue()
+    
+    #previously expanded states (for cycle checking), holds states
+    exploredNodes = []
+    
+    startState = problem.getStartState()
+    startNode = (startState, [], 0) #(state, action, cost)
+    
+    frontier.push(startNode)
+    
+    while not frontier.isEmpty():
+        #begin exploring first (earliest-pushed) node on frontier
+        currentState, actions, currentCost = frontier.pop()
+        
+        if currentState not in exploredNodes:
+            #put popped node state into explored list
+            exploredNodes.append(currentState)
+
+            if problem.isGoalState(currentState):
+                return actions
+            else:
+                #list of (successor, action, stepCost)
+                successors = problem.getSuccessors(currentState)
+                
+                for succState, succAction, succCost in successors:
+                    newAction = actions + [succAction]
+                    newCost = currentCost + succCost
+                    newNode = (succState, newAction, newCost)
+
+                    frontier.push(newNode)
+
+    return actions
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
